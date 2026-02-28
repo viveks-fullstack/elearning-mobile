@@ -1,40 +1,43 @@
 /* Attendance Component Styles */
 .tabsHeader {
-  display: flex;
-  border-bottom: 2px solid #e5e7eb;
-  margin-bottom: 24px;
+  border-radius: 16px;
+  display: inline-flex;
   gap: 8px;
+  padding: 8px;
+  margin-bottom: 24px;
 }
 
 .tabButton {
-  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 12px 24px;
-  border: 1px solid transparent;
-  border-bottom: none;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  cursor: pointer;
+  border-radius: 12px;
   font-weight: 500;
-  font-size: 0.95rem;
+  border: 1px solid transparent;
+  cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
+  line-height: 1.2;
+  font-size: 0.95rem;
 }
 
 .tabButtonActive {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  border-color: #667eea;
-  transform: translateY(2px);
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .tabButtonInactive {
   background: transparent;
-  color: #6b7280;
-  border-color: transparent;
+  color: #64748b;
+  border-color: rgba(148, 163, 184, 0.35);
 }
 
 .tabButtonInactive:hover {
-  color: #374151;
-  border-color: #d1d5db;
+  color: #475569;
+  border-color: rgba(102, 126, 234, 0.45);
 }
 
 .tabButton:focus-visible {

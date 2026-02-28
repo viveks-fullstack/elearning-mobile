@@ -170,7 +170,7 @@ export default function Attendance() {
         <h2 className="mb-3">Attendance Management</h2>
 
         {/* Tabs */}
-        <div className={styles.tabsHeader}>
+        <div className={`glass-card ${styles.tabsHeader}`}>
           <button
             onClick={() => setActiveTab("login")}
             className={`${styles.tabButton} ${activeTab === "login" ? styles.tabButtonActive : styles.tabButtonInactive}`}
