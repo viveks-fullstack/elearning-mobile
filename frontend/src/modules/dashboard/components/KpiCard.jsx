@@ -1,81 +1,28 @@
+import styles from "./DashboardCards.module.css";
+
 export default function KpiCard({ title, value, icon, color }) {
+  const colorClassByHex = {
+    "#667eea": styles.colorIndigo,
+    "#764ba2": styles.colorPurple,
+    "#f093fb": styles.colorPink,
+    "#4facfe": styles.colorBlue,
+  };
+
+  const colorClass = colorClassByHex[color] || styles.colorIndigo;
+
   return (
     <div className="col-md-3">
       <div
-        className="glass-card animate-slide-in"
-        style={{
-          padding: "28px",
-          borderRadius: "20px",
-          cursor: "pointer",
-          position: "relative",
-          overflow: "hidden",
-          minHeight: "160px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-8px)";
-          e.currentTarget.style.boxShadow =
-            "0 16px 48px rgba(31, 38, 135, 0.2)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 8px 32px rgba(31, 38, 135, 0.1)";
-        }}
+        className={`glass-card animate-slide-in ${styles.kpiCard} ${colorClass}`}
       >
         {/* Icon Circle */}
-        <div
-          style={{
-            width: "60px",
-            height: "60px",
-            borderRadius: "16px",
-            background: `linear-gradient(135deg, ${color}, ${color}cc)`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "1.8rem",
-            marginBottom: "20px",
-            boxShadow: `0 8px 24px ${color}40`,
-          }}
-        >
-          {icon}
-        </div>
+        <div className={styles.kpiIcon}>{icon}</div>
 
         <div>
-          <h6
-            className="text-muted mb-2"
-            style={{
-              fontSize: "0.9rem",
-              fontWeight: 500,
-            }}
-          >
-            {title}
-          </h6>
-          <h2
-            className="fw-bold mb-0"
-            style={{
-              color: "#1e293b",
-              fontSize: "2rem",
-            }}
-          >
-            {value}
-          </h2>
+          <h6 className={`text-muted mb-2 ${styles.kpiTitle}`}>{title}</h6>
+          <h2 className={`fw-bold mb-0 ${styles.kpiValue}`}>{value}</h2>
         </div>
-
-        {/* Decorative element */}
-        <div
-          style={{
-            position: "absolute",
-            width: "100px",
-            height: "100px",
-            background: `${color}15`,
-            borderRadius: "50%",
-            bottom: "-30px",
-            right: "-30px",
-            filter: "blur(20px)",
-          }}
-        />
+        <div className={styles.kpiDecor} />
       </div>
     </div>
   );

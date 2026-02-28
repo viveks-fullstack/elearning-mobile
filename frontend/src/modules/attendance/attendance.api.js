@@ -48,6 +48,19 @@ export const updateAttendance = async (id, attendanceData) => {
     return res.data.data
 }
 
+// Record logout
+export const recordLogout = async () => {
+    const res = await api.post('/attendance/logout')
+    return res.data.data
+}
+
+// Get user login/logout history
+export const getUserLoginAttendance = async (startDate, endDate) => {
+    const res = await api.get('/attendance/login-history', {
+        params: { startDate, endDate }
+    })
+    return res.data.data
+}
 // Delete attendance record
 export const deleteAttendance = async (id) => {
     const res = await api.delete(`/attendance/${id}`)

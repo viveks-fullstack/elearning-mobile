@@ -7,7 +7,13 @@ export const updateProfileSchema = yup.object({
     phone: yup.string()
         .matches(/^[0-9]{10}$/, 'Phone must be 10 digits')
         .optional(),
-    profileImage: yup.string().url('Invalid image URL').nullable()
+    profileImage: yup.string()
+        .nullable()
+        .test(
+            'is-valid-image-path',
+            'Invalid image URL',
+            (value) => !value || /^https?:\/\//.test(value) || value.startsWith('/uploads/')
+        )
 });
 
 export const changePasswordSchema = yup.object({

@@ -140,3 +140,43 @@ export const getAttendanceReport = async (req, reply) => {
 
     return success(reply, Object.values(report), 'Attendance report fetched successfully', 200)
 }
+// Record user logout
+export const recordLogout = async (req, reply) => {
+    const userId = req.user.id
+
+    try {
+        const attendance = await Attendance.recordLogout(userId)
+
+        if (!attendance) {
+            return reply.code(404).send({ message: 'No login record found for today' })
+        }
+
+        return success(reply, attendance, 'Logout recorded successfully', 200)
+    } catch (err) {
+        req.log.error(err)
+        return reply.code(500).send({ message: 'Failed to record logout' })
+    }
+}
+
+// Get user login attendance (teachers and students login history)
+export const getUserLoginAttendance = async (req, reply) => {
+    const userId = req.user.id
+    const { startDate, endDate } = req.query
+
+    if (!startDate || !endDate) {
+        return reply.code(400).send({ message: 'startDate and endDate are required' })
+    }
+
+    try {
+        const attendance = await Attendance.getUserLoginAttendance(
+            userId,
+            new Date(startDate),
+            new Date(endDate)
+        ).populate('user', 'name email role')
+
+        return success(reply, attendance, 'Login attendance fetched successfully', 200)
+    } catch (err) {
+        req.log.error(err)
+        return reply.code(500).send({ message: 'Failed to fetch login attendance' })
+    }
+}

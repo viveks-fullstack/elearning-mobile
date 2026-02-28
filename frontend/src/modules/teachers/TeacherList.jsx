@@ -8,6 +8,7 @@ import Pagination from "../../components/Pagination";
 import Button from "../../components/Button";
 import AddUpdateTeacher from "./components/AddUpdateTeacher";
 import toast from "react-hot-toast";
+import styles from "./TeachersList.module.css";
 
 export default function TeacherList() {
   const [showModal, setShowModal] = useState(false);
@@ -81,32 +82,14 @@ export default function TeacherList() {
   );
 
   return (
-    <div
-      className="container-fluid py-4"
-      style={{ paddingTop: "30px !important" }}
-    >
-      <div
-        className="animate-fade-in"
-        style={{
-          padding: "35px 40px",
-          borderRadius: "24px",
-          marginBottom: "30px",
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          boxShadow: "0 10px 40px rgba(102, 126, 234, 0.25)",
-        }}
-      >
+    <div className={`container-fluid py-4 ${styles.container}`}>
+      <div className={`animate-fade-in ${styles.heroBanner}`}>
         <div className="d-flex justify-content-between align-items-center">
           <div>
-            <h2 className="fw-bold mb-2" style={{ color: "white" }}>
+            <h2 className={`fw-bold mb-2 ${styles.heroTitle}`}>
               👨‍🏫 Teachers Management
             </h2>
-            <p
-              className="mb-0"
-              style={{
-                color: "rgba(255, 255, 255, 0.85)",
-                fontSize: "0.95rem",
-              }}
-            >
+            <p className={`mb-0 ${styles.heroSubtitle}`}>
               Manage and view all teacher information
             </p>
           </div>
@@ -118,13 +101,7 @@ export default function TeacherList() {
 
       <div className="row">
         <div className="col-12">
-          <div
-            className="glass-card animate-slide-in"
-            style={{
-              padding: "32px",
-              borderRadius: "24px",
-            }}
-          >
+          <div className={`glass-card animate-slide-in ${styles.contentCard}`}>
             {isLoading ? (
               <div className="d-flex justify-content-center align-items-center py-5">
                 <Spinner />

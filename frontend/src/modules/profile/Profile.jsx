@@ -7,7 +7,12 @@ import { useState, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { fetchProfile, updateProfile, changePassword } from "./profile.api";
+import {
+  fetchProfile,
+  updateProfile,
+  changePassword,
+  uploadProfileImage,
+} from "./profile.api";
 import {
   updateProfileSchema,
   changePasswordSchema,
@@ -15,9 +20,25 @@ import {
 import { toastSuccess, toastError } from "../../utils/toast";
 import Button from "../../components/Button";
 import Spinner from "../../components/Spinner";
+import { FormField, PasswordField } from "../../components/FormField";
 import EyeOpen from "../../assets/svg/EyeOpen";
 import EyeClosed from "../../assets/svg/EyeClosed";
 import UserIcon from "../../assets/svg/UserIcon";
+import styles from "./Profile.module.css";
+import headerStyles from "../../styles/PageHeader.module.css";
+
+const toAbsoluteImageUrl = (image) => {
+  if (!image) return null;
+  if (
+    image.startsWith("http") ||
+    image.startsWith("blob:") ||
+    image.startsWith("data:")
+  ) {
+    return image;
+  }
+
+  return `${import.meta.env.VITE_API_BASE_URL?.replace("/api", "")}${image}`;
+};
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("profile");
@@ -25,6 +46,7 @@ export default function Profile() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -47,6 +69,12 @@ export default function Profile() {
         }
       : {},
   });
+
+  const {
+    setValue: setProfileValue,
+    getValues: getProfileValues,
+    formState: { errors: profileErrors },
+  } = profileForm;
 
   // Password form
   const passwordForm = useForm({
@@ -100,16 +128,42 @@ export default function Profile() {
     setActiveTab(tab);
   }, []);
 
-  const handleImageChange = useCallback((e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  }, []);
+  const handleImageChange = useCallback(
+    async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const previousImage =
+        getProfileValues("profileImage") || profile?.profileImage || null;
+      const localPreview = URL.createObjectURL(file);
+      setImagePreview(localPreview);
+      setIsUploadingImage(true);
+
+      try {
+        const uploadRes = await uploadProfileImage({ file, type: "local" });
+        const imagePath =
+          uploadRes.filepath || uploadRes.path || uploadRes.url || "";
+
+        if (!imagePath) {
+          throw new Error("Image upload response did not include a URL");
+        }
+
+        setProfileValue("profileImage", imagePath, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        setImagePreview(toAbsoluteImageUrl(imagePath));
+        toastSuccess("Profile image uploaded");
+      } catch (error) {
+        setImagePreview(toAbsoluteImageUrl(previousImage));
+        toastError(error.response?.data?.message || "Failed to upload image");
+      } finally {
+        URL.revokeObjectURL(localPreview);
+        setIsUploadingImage(false);
+      }
+    },
+    [getProfileValues, profile?.profileImage, setProfileValue],
+  );
 
   const tabs = useMemo(
     () => [
@@ -122,8 +176,7 @@ export default function Profile() {
   if (isLoading) {
     return (
       <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "400px" }}
+        className={`d-flex justify-content-center align-items-center ${styles.loadingContainer}`}
       >
         <Spinner />
       </div>
@@ -131,78 +184,27 @@ export default function Profile() {
   }
 
   return (
-    <div
-      className="container-fluid px-4 py-4"
-      style={{ paddingTop: "30px !important" }}
-    >
+    <div className={`container-fluid px-4 py-4 ${styles.container}`}>
       {/* Header */}
-      <div
-        className="animate-fade-in"
-        style={{
-          padding: "35px 40px",
-          borderRadius: "24px",
-          marginBottom: "30px",
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          boxShadow: "0 10px 40px rgba(102, 126, 234, 0.25)",
-        }}
-      >
+      <div className={`animate-fade-in ${headerStyles.pageHeader}`}>
         <h2
-          className="fw-bold mb-2"
-          style={{
-            color: "white",
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-          }}
+          className={`fw-bold mb-2 ${headerStyles.pageTitle} ${headerStyles.titleWithIcon}`}
         >
           <UserIcon size={32} color="white" /> My Profile
         </h2>
-        <p
-          className="mb-0"
-          style={{ color: "rgba(255, 255, 255, 0.85)", fontSize: "0.95rem" }}
-        >
+        <p className={headerStyles.pageSubtitle}>
           Manage your account settings and preferences
         </p>
       </div>
 
       {/* Tabs */}
-      <div
-        className="glass-card mb-4 p-2"
-        style={{ borderRadius: "16px", display: "inline-flex", gap: "8px" }}
-      >
+      <div className={`glass-card mb-4 p-2 ${styles.tabsContainer}`}>
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={`btn ${activeTab === tab.id ? "" : "btn-link"}`}
+            className={`${styles.tabButton} ${activeTab === tab.id ? styles.tabButtonActive : styles.tabButtonInactive}`}
             onClick={() => handleTabChange(tab.id)}
             type="button"
-            style={{
-              padding: "12px 24px",
-              borderRadius: "12px",
-              fontWeight: 500,
-              border: "none",
-              background:
-                activeTab === tab.id
-                  ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-                  : "transparent",
-              color: activeTab === tab.id ? "white" : "#64748b",
-              transition: "all 0.3s ease",
-              textDecoration: "none",
-              boxShadow:
-                activeTab === tab.id
-                  ? "0 4px 12px rgba(102, 126, 234, 0.3)"
-                  : "none",
-            }}
-            onMouseEnter={(e) => {
-              if (activeTab !== tab.id) {
-                e.currentTarget.style.background = "rgba(99, 102, 241, 0.05)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeTab !== tab.id) {
-                e.currentTarget.style.background = "transparent";
-              }
-            }}
           >
             {tab.label}
           </button>
@@ -211,41 +213,26 @@ export default function Profile() {
 
       {/* Profile Information Tab */}
       {activeTab === "profile" && (
-        <div
-          className="glass-card animate-slide-in"
-          style={{
-            padding: "40px",
-            borderRadius: "24px",
-          }}
-        >
+        <div className={`glass-card animate-slide-in ${styles.profileCard}`}>
           <form onSubmit={profileForm.handleSubmit(handleProfileSubmit)}>
             <div className="row">
               {/* Profile Image */}
               <div className="col-md-4 mb-4 text-center">
                 <div className="mb-3">
                   <div
-                    className="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
-                    style={{
-                      width: "150px",
-                      height: "150px",
-                      backgroundColor: "#e9ecef",
-                      overflow: "hidden",
-                    }}
+                    className={`rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center ${styles.profileImageCircle}`}
                   >
                     {imagePreview || profile?.profileImage ? (
                       <img
-                        src={imagePreview || profile?.profileImage}
+                        src={toAbsoluteImageUrl(
+                          imagePreview || profile?.profileImage,
+                        )}
                         alt="Profile"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
+                        className={styles.profileImage}
                       />
                     ) : (
                       <i
-                        className="bi bi-person"
-                        style={{ fontSize: "4rem", color: "#6c757d" }}
+                        className={`bi bi-person ${styles.profilePlaceholderIcon}`}
                       ></i>
                     )}
                   </div>
@@ -255,13 +242,19 @@ export default function Profile() {
                     onChange={handleImageChange}
                     className="d-none"
                     id="profileImageInput"
+                    disabled={isUploadingImage}
                   />
                   <label
                     htmlFor="profileImageInput"
-                    className="btn btn-sm btn-outline-primary"
+                    className={`${styles.changePhotoButton} ${isUploadingImage ? styles.changePhotoButtonDisabled : ""}`}
                   >
-                    Change Photo
+                    {isUploadingImage ? "Uploading..." : "Change Photo"}
                   </label>
+                  {profileErrors.profileImage && (
+                    <div className={styles.imageError}>
+                      {profileErrors.profileImage.message}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -269,65 +262,59 @@ export default function Profile() {
               <div className="col-md-8">
                 <div className="row">
                   {/* Name */}
-                  <div className="col-md-12 mb-3">
-                    <label className="form-label fw-semibold">Full Name</label>
-                    <input
-                      type="text"
-                      className={`form-control ${profileForm.formState.errors.name ? "is-invalid" : ""}`}
-                      {...profileForm.register("name")}
+                  <div className="col-md-12">
+                    <FormField
+                      label="Full Name"
+                      name="name"
+                      control={profileForm.control}
+                      errors={profileForm.formState.errors}
+                      placeholder="Enter your full name"
                     />
-                    <div className="invalid-feedback">
-                      {profileForm.formState.errors.name?.message}
-                    </div>
                   </div>
 
                   {/* Email */}
-                  <div className="col-md-12 mb-3">
-                    <label className="form-label fw-semibold">
-                      Email Address
-                    </label>
-                    <input
+                  <div className="col-md-12">
+                    <FormField
+                      label="Email Address"
+                      name="email"
+                      control={profileForm.control}
+                      errors={profileForm.formState.errors}
                       type="email"
-                      className={`form-control ${profileForm.formState.errors.email ? "is-invalid" : ""}`}
-                      {...profileForm.register("email")}
+                      placeholder="Enter your email"
                     />
-                    <div className="invalid-feedback">
-                      {profileForm.formState.errors.email?.message}
-                    </div>
                   </div>
 
                   {/* Phone */}
-                  <div className="col-md-12 mb-3">
-                    <label className="form-label fw-semibold">
-                      Phone Number
-                    </label>
-                    <input
-                      type="text"
-                      className={`form-control ${profileForm.formState.errors.phone ? "is-invalid" : ""}`}
-                      {...profileForm.register("phone")}
+                  <div className="col-md-12">
+                    <FormField
+                      label="Phone Number"
+                      name="phone"
+                      control={profileForm.control}
+                      errors={profileForm.formState.errors}
+                      type="tel"
+                      placeholder="Enter your phone number"
                     />
-                    <div className="invalid-feedback">
-                      {profileForm.formState.errors.phone?.message}
-                    </div>
                   </div>
 
                   {/* Role (Read-only) */}
-                  <div className="col-md-12 mb-3">
-                    <label className="form-label fw-semibold">Role</label>
-                    <input
+                  {/* <div className="col-md-12 mb-3">
+                    <Input
+                      label="Role"
                       type="text"
-                      className="form-control"
                       value={profile?.role?.toUpperCase() || ""}
                       disabled
+                      className={styles.roleInput}
                     />
-                  </div>
+                  </div> */}
 
                   {/* Submit Button */}
                   <div className="col-md-12">
                     <Button
                       type="submit"
                       variant="primary"
-                      loading={updateProfileMutation.isPending}
+                      loading={
+                        updateProfileMutation.isPending || isUploadingImage
+                      }
                     >
                       Update Profile
                     </Button>
@@ -341,92 +328,56 @@ export default function Profile() {
 
       {/* Change Password Tab */}
       {activeTab === "password" && (
-        <div
-          className="glass-card animate-slide-in"
-          style={{
-            padding: "40px",
-            borderRadius: "24px",
-          }}
-        >
+        <div className={`glass-card animate-slide-in ${styles.profileCard}`}>
           <div className="row justify-content-center">
             <div className="col-md-7">
               <form onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)}>
                 {/* Current Password */}
-                <div className="mb-3">
-                  <label className="form-label fw-semibold">
-                    Current Password
-                  </label>
-                  <div className="position-relative">
-                    <input
-                      type={showCurrentPassword ? "text" : "password"}
-                      className={`form-control ${passwordForm.formState.errors.currentPassword ? "is-invalid" : ""}`}
-                      {...passwordForm.register("currentPassword")}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-link position-absolute end-0 top-50 translate-middle-y"
-                      onClick={() =>
-                        setShowCurrentPassword(!showCurrentPassword)
-                      }
-                      style={{ zIndex: 10 }}
-                    >
-                      {showCurrentPassword ? <EyeOpen /> : <EyeClosed />}
-                    </button>
-                    <div className="invalid-feedback">
-                      {passwordForm.formState.errors.currentPassword?.message}
-                    </div>
-                  </div>
-                </div>
+                <PasswordField
+                  label="Current Password"
+                  name="currentPassword"
+                  control={passwordForm.control}
+                  errors={passwordForm.formState.errors}
+                  placeholder="Enter your current password"
+                  showPassword={showCurrentPassword}
+                  onTogglePassword={() =>
+                    setShowCurrentPassword(!showCurrentPassword)
+                  }
+                  PasswordIcon={
+                    showCurrentPassword ? <EyeOpen /> : <EyeClosed />
+                  }
+                  required
+                />
 
                 {/* New Password */}
-                <div className="mb-3">
-                  <label className="form-label fw-semibold">New Password</label>
-                  <div className="position-relative">
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      className={`form-control ${passwordForm.formState.errors.newPassword ? "is-invalid" : ""}`}
-                      {...passwordForm.register("newPassword")}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-link position-absolute end-0 top-50 translate-middle-y"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      style={{ zIndex: 10 }}
-                    >
-                      {showNewPassword ? <EyeOpen /> : <EyeClosed />}
-                    </button>
-                    <div className="invalid-feedback">
-                      {passwordForm.formState.errors.newPassword?.message}
-                    </div>
-                  </div>
-                </div>
+                <PasswordField
+                  label="New Password"
+                  name="newPassword"
+                  control={passwordForm.control}
+                  errors={passwordForm.formState.errors}
+                  placeholder="Enter your new password"
+                  showPassword={showNewPassword}
+                  onTogglePassword={() => setShowNewPassword(!showNewPassword)}
+                  PasswordIcon={showNewPassword ? <EyeOpen /> : <EyeClosed />}
+                  required
+                />
 
                 {/* Confirm Password */}
-                <div className="mb-4">
-                  <label className="form-label fw-semibold">
-                    Confirm New Password
-                  </label>
-                  <div className="position-relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      className={`form-control ${passwordForm.formState.errors.confirmPassword ? "is-invalid" : ""}`}
-                      {...passwordForm.register("confirmPassword")}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-link position-absolute end-0 top-50 translate-middle-y"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      style={{ zIndex: 10 }}
-                    >
-                      {showConfirmPassword ? <EyeOpen /> : <EyeClosed />}
-                    </button>
-                    <div className="invalid-feedback">
-                      {passwordForm.formState.errors.confirmPassword?.message}
-                    </div>
-                  </div>
-                </div>
+                <PasswordField
+                  label="Confirm New Password"
+                  name="confirmPassword"
+                  control={passwordForm.control}
+                  errors={passwordForm.formState.errors}
+                  placeholder="Confirm your new password"
+                  showPassword={showConfirmPassword}
+                  onTogglePassword={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
+                  PasswordIcon={
+                    showConfirmPassword ? <EyeOpen /> : <EyeClosed />
+                  }
+                  required
+                />
 
                 {/* Submit Button */}
                 <Button

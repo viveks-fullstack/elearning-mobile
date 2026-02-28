@@ -42,6 +42,11 @@ export const regenerateMeetingLink = async (id) => {
     return res.data.data
 }
 
+export const generateAuthorizedMeetingLink = async (id) => {
+    const res = await api.get(API_ENDPOINTS.GENERATE_MEETING_LINK(id))
+    return res.data.data
+}
+
 export const fetchClassesByTeacher = async (teacherId) => {
     const res = await api.get(API_ENDPOINTS.CLASS_TEACHER(teacherId))
     return res.data.data

@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
+import styles from "./DashboardCards.module.css";
 
 export default function StatCard({ title, value, icon, color }) {
   const [displayValue, setDisplayValue] = useState(0);
+  const colorClassByHex = {
+    "#667eea": styles.borderIndigo,
+    "#764ba2": styles.borderPurple,
+    "#f093fb": styles.borderPink,
+    "#4facfe": styles.borderBlue,
+  };
+
+  const borderClass = colorClassByHex[color] || styles.borderIndigo;
 
   useEffect(() => {
     let start = 0;
@@ -24,32 +33,16 @@ export default function StatCard({ title, value, icon, color }) {
   return (
     <div className="col-md-4">
       <div
-        className="glass-card animate-fade-in"
-        style={{
-          padding: "28px",
-          borderRadius: "20px",
-          borderLeft: `5px solid ${color || "#6366f1"}`,
-          transition: "all 0.3s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-4px)";
-          e.currentTarget.style.boxShadow = "0 12px 40px rgba(0, 0, 0, 0.15)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
-        }}
+        className={`glass-card animate-fade-in ${styles.statCard} ${borderClass}`}
       >
         <div className="d-flex justify-content-between align-items-center">
           <div>
-            <h6 className="text-muted mb-1" style={{ fontSize: "0.9rem" }}>
-              {title}
-            </h6>
-            <h2 className="fw-bold mb-0" style={{ color: "#1e293b" }}>
+            <h6 className={`text-muted mb-1 ${styles.statTitle}`}>{title}</h6>
+            <h2 className={`fw-bold mb-0 ${styles.statValue}`}>
               {displayValue}
             </h2>
           </div>
-          <div style={{ fontSize: "32px", opacity: 0.7 }}>{icon}</div>
+          <div className={styles.statIcon}>{icon}</div>
         </div>
       </div>
     </div>

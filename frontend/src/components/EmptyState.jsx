@@ -3,6 +3,8 @@
  * Modern UI component for displaying empty states with SVG illustrations
  */
 
+import styles from "./EmptyState.module.css";
+
 const EmptyState = ({
   title = "No Data Available",
   message = "There are no records to display at the moment.",
@@ -14,8 +16,7 @@ const EmptyState = ({
         viewBox="0 0 400 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-100"
-        style={{ maxWidth: "250px" }}
+        className={`w-100 ${styles.content}`}
       >
         <circle cx="200" cy="150" r="120" fill="#F3F4F6" />
         <path
@@ -38,8 +39,7 @@ const EmptyState = ({
         viewBox="0 0 400 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-100"
-        style={{ maxWidth: "250px" }}
+        className={`w-100 ${styles.content}`}
       >
         <circle cx="200" cy="150" r="120" fill="#EEF2FF" />
         <circle cx="200" cy="130" r="30" fill="#C7D2FE" />
@@ -61,8 +61,7 @@ const EmptyState = ({
         viewBox="0 0 400 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-100"
-        style={{ maxWidth: "250px" }}
+        className={`w-100 ${styles.content}`}
       >
         <circle cx="200" cy="150" r="120" fill="#FEF3C7" />
         <rect x="150" y="100" width="100" height="120" rx="8" fill="#FDE68A" />
@@ -80,8 +79,7 @@ const EmptyState = ({
         viewBox="0 0 400 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-100"
-        style={{ maxWidth: "250px" }}
+        className={`w-100 ${styles.content}`}
       >
         <circle cx="200" cy="150" r="120" fill="#DBEAFE" />
         <rect x="130" y="100" width="140" height="100" rx="8" fill="#BFDBFE" />
@@ -95,8 +93,7 @@ const EmptyState = ({
         viewBox="0 0 400 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-100"
-        style={{ maxWidth: "250px" }}
+        className={`w-100 ${styles.content}`}
       >
         <circle cx="200" cy="150" r="120" fill="#D1FAE5" />
         <rect x="140" y="90" width="120" height="140" rx="8" fill="#A7F3D0" />
@@ -115,13 +112,41 @@ const EmptyState = ({
         />
       </svg>
     ),
+    attendance: (
+      <svg
+        viewBox="0 0 400 300"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={`w-100 ${styles.content}`}
+      >
+        <circle cx="200" cy="150" r="120" fill="#E0E7FF" />
+        <rect x="140" y="90" width="120" height="140" rx="8" fill="#C7D2FE" />
+        <path
+          d="M165 120h70M165 140h70"
+          stroke="#818CF8"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+        <circle cx="175" cy="170" r="8" fill="#6366F1" />
+        <circle cx="175" cy="195" r="8" fill="#6366F1" />
+        <path
+          d="M195 165l8 8 15-15M195 190l8 8 15-15"
+          stroke="#4F46E5"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
   };
 
   return (
     <div className="d-flex flex-column align-items-center justify-content-center py-5">
       <div className="mb-4">{illustrations[type] || illustrations.default}</div>
       <h5 className="fw-bold text-dark mb-2">{title}</h5>
-      <p className="text-muted text-center mb-0" style={{ maxWidth: "400px" }}>
+      <p
+        className={`text-muted text-center mb-0 ${styles.emptyContentContainer}`}
+      >
         {message}
       </p>
     </div>

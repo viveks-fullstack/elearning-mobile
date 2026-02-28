@@ -205,19 +205,71 @@ h6 {
 }
 
 .form-control,
-.form-select {
+.form-select,
+.form-control-file {
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  padding: 0.65rem 1rem;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #dee2e6;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+  background: white;
+  font-size: 0.95rem;
+}
+
+.form-control:hover:not(:disabled),
+.form-select:hover:not(:disabled) {
+  border-color: #667eea;
 }
 
 .form-control:focus,
 .form-select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: #667eea;
+  border-width: 2px;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   background: white;
+  outline: none;
+  padding: 11px 15px; /* Adjust padding to compensate for increased border */
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545;
+  border-width: 1px;
+  padding: 12px 16px;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+  border-color: #dc3545;
+  border-width: 2px;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+  padding: 11px 15px;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  background-color: #f8f9fa;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.invalid-feedback {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.875rem;
+  color: #dc3545;
 }
 
 .table {

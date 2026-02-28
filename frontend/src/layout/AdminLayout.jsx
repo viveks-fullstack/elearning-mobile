@@ -1,21 +1,16 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
+import styles from "./AdminLayout.module.css";
 
 export default function AdminLayout() {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className={styles.layout}>
       <Sidebar />
 
-      <div
-        style={{
-          flex: 1,
-          background: "#f8fafc",
-          position: "relative",
-        }}
-      >
+      <div className={styles.main}>
         <Topbar />
-        <div style={{ padding: "0" }}>
+        <div className={styles.content}>
           <Outlet />
         </div>
       </div>

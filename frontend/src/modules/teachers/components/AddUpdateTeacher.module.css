@@ -1,0 +1,125 @@
+/* Teacher Form Styles */
+.sectionHeader {
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+}
+
+.qualificationCard {
+  margin-bottom: 12px;
+  padding: 12px;
+}
+
+.experienceCard {
+  margin-bottom: 12px;
+  padding: 12px;
+}
+
+.removeButton {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #dc3545;
+  background: transparent;
+  color: #dc3545;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.removeButton:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.removeInlineButton {
+  width: 100%;
+  border-color: rgba(220, 53, 69, 0.7);
+  color: #dc3545;
+}
+
+.removeInlineButton:hover {
+  border-color: #dc3545;
+  background: rgba(220, 53, 69, 0.08);
+}
+
+.selectLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.fieldError {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.addInlineButton {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid #667eea;
+  background: transparent;
+  color: #667eea;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.addInlineButton:hover {
+  background: #667eea;
+  color: white;
+}
+
+.addButton {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 2px dashed #667eea;
+  background: transparent;
+  color: #667eea;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.addButton:hover {
+  background: rgba(102, 126, 234, 0.05);
+  border-color: #764ba2;
+}
+
+.submitButton {
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+.cancelButton {
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.spinner {
+  display: inline-block;
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

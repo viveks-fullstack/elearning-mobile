@@ -3,9 +3,16 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import { createClassSchema } from "../classes.validation";
-import { createClass, updateClass } from "../classes.api";
+import {
+  createClass,
+  updateClass,
+  generateAuthorizedMeetingLink,
+} from "../classes.api";
 import toast from "react-hot-toast";
 import Button from "../../../components/Button";
+import { FormField } from "../../../components/FormField";
+import modalStyles from "../../../components/Modal.module.css";
+import styles from "./AddUpdateClass.module.css";
 
 export default function AddUpdateClass({
   onClose,
@@ -77,172 +84,110 @@ export default function AddUpdateClass({
 
   const isLoading = addMutation.isPending || updateMutation.isPending;
 
+  const handleCopyMeetingLink = async () => {
+    try {
+      if (!classData?._id) return;
+      const linkData = await generateAuthorizedMeetingLink(classData._id);
+      const linkToCopy = linkData?.joinUrl;
+
+      if (!linkToCopy) {
+        toast.error("Meeting link is not available");
+        return;
+      }
+
+      navigator.clipboard.writeText(linkToCopy);
+      toast.success("Authorized meeting link copied to clipboard!");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to generate secure link",
+      );
+    }
+  };
+
   return (
-    <div
-      className="modal d-block"
-      style={{
-        backgroundColor: "rgba(0,0,0,0.4)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-      }}
-    >
-      <div className="modal-dialog modal-lg" style={{ margin: "30px auto" }}>
+    <div className={`modal d-block ${modalStyles.modalOverlay}`}>
+      <div className={`modal-dialog modal-lg ${modalStyles.modalDialog}`}>
         <div
-          className="modal-content glass-card animate-fade-in"
-          style={{
-            border: "none",
-            borderRadius: "24px",
-            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
-            overflow: "hidden",
-          }}
+          className={`modal-content glass-card animate-fade-in ${modalStyles.modalContent}`}
         >
-          <div
-            className="modal-header border-0"
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              padding: "24px 32px",
-              borderRadius: "24px 24px 0 0",
-            }}
-          >
-            <h5
-              className="modal-title fw-bold"
-              style={{ color: "white", fontSize: "1.25rem" }}
-            >
+          <div className={`modal-header border-0 ${modalStyles.modalHeader}`}>
+            <h5 className={`modal-title fw-bold ${modalStyles.modalTitle}`}>
               {classData ? "Update Class" : "Add New Class"}
             </h5>
             <button
               type="button"
-              className="btn-close btn-close-white"
+              className={`btn-close btn-close-white ${modalStyles.closeButton}`}
               onClick={onClose}
-              style={{ filter: "brightness(0) invert(1)" }}
             ></button>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div
-              className="modal-body"
-              style={{
-                padding: "32px",
-                maxHeight: "calc(100vh - 250px)",
-                overflowY: "auto",
-              }}
-            >
+            <div className={`modal-body ${modalStyles.modalBody}`}>
               <div className="row">
                 {/* Title */}
                 <div className="col-12 mb-3">
-                  <label className="form-label fw-bold">
-                    Class Title <span className="text-danger">*</span>
-                  </label>
-                  <Controller
+                  <FormField
+                    label="Class Title"
                     name="title"
                     control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        type="text"
-                        className={`form-control ${errors.title ? "is-invalid" : ""}`}
-                        placeholder="Enter class title"
-                      />
-                    )}
+                    errors={errors}
+                    placeholder="Enter class title"
+                    required
                   />
-                  {errors.title && (
-                    <div className="invalid-feedback d-block">
-                      {errors.title.message}
-                    </div>
-                  )}
                 </div>
 
                 {/* Total Hours */}
                 <div className="col-12 mb-3">
-                  <label className="form-label fw-bold">
-                    Total Hours <span className="text-danger">*</span>
-                  </label>
-                  <Controller
+                  <FormField
+                    label="Total Hours"
                     name="totalHours"
                     control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        type="number"
-                        className={`form-control ${errors.totalHours ? "is-invalid" : ""}`}
-                        placeholder="Enter total hours"
-                        min="0"
-                      />
-                    )}
+                    errors={errors}
+                    type="number"
+                    placeholder="Enter total hours"
+                    required
                   />
-                  {errors.totalHours && (
-                    <div className="invalid-feedback d-block">
-                      {errors.totalHours.message}
-                    </div>
-                  )}
                 </div>
 
                 {/* Meeting Link (Display only if editing) */}
-                {classData?.meetingLink && (
+                {classData?._id && (
                   <div className="col-12 mb-3">
-                    <label className="form-label fw-bold">Meeting Link</label>
-                    <div className="input-group">
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={classData.meetingLink}
-                        readOnly
-                      />
+                    <label className={styles.meetingLinkLabel}>
+                      Secure Meeting Link
+                    </label>
+                    <div className={styles.meetingLinkContainer}>
                       <button
                         type="button"
-                        className="btn btn-outline-secondary"
-                        onClick={() => {
-                          navigator.clipboard.writeText(classData.meetingLink);
-                          toast.success("Link copied to clipboard!");
-                        }}
+                        className={styles.copyButton}
+                        onClick={handleCopyMeetingLink}
                       >
-                        Copy
+                        Generate & Copy
                       </button>
                     </div>
-                    <small className="text-muted">
-                      Meeting link is auto-generated when creating a class
+                    <small className={styles.noteText}>
+                      Generates a short-lived authorized Jitsi join link for the
+                      logged-in user.
                     </small>
                   </div>
                 )}
               </div>
             </div>
 
-            <div
-              className="modal-footer border-0"
-              style={{ padding: "20px 32px 32px", gap: "12px" }}
-            >
+            <div className={`modal-footer border-0 ${modalStyles.modalFooter}`}>
               <Button
                 variant="secondary"
                 onClick={onClose}
                 disabled={isLoading}
-                style={{
-                  padding: "12px 32px",
-                  borderRadius: "12px",
-                  fontWeight: "600",
-                }}
               >
                 Cancel
               </Button>
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={isLoading}
-                style={{
-                  padding: "12px 32px",
-                  borderRadius: "12px",
-                  fontWeight: "600",
-                  background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  border: "none",
-                }}
-              >
+              <Button variant="primary" type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <span
                       className="spinner-border spinner-border-sm me-2"
                       role="status"
                       aria-hidden="true"
-                      style={{ display: "inline-block" }}
                     ></span>
                     {classData ? "Updating..." : "Adding..."}
                   </>

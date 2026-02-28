@@ -4,6 +4,7 @@
  */
 
 import PropTypes from "prop-types";
+import styles from "./Pagination.module.css";
 
 const Pagination = ({
   currentPage,
@@ -49,66 +50,28 @@ const Pagination = ({
 
   return (
     <div
-      className="d-flex align-items-center justify-content-between mt-4"
-      style={{
-        padding: "20px",
-        background: "rgba(99, 102, 241, 0.03)",
-        borderRadius: "16px",
-      }}
+      className={`d-flex align-items-center justify-content-between ${styles.paginationContainer}`}
     >
       {showInfo && (
         <div className="d-none d-sm-block">
-          <p
-            className="mb-0"
-            style={{
-              fontSize: "0.9rem",
-              color: "#64748b",
-              fontWeight: 500,
-            }}
-          >
-            Showing{" "}
-            <span style={{ fontWeight: 600, color: "#1e293b" }}>
-              {startItem}
-            </span>{" "}
-            to{" "}
-            <span style={{ fontWeight: 600, color: "#1e293b" }}>{endItem}</span>{" "}
-            of{" "}
-            <span style={{ fontWeight: 600, color: "#1e293b" }}>
-              {totalItems}
-            </span>{" "}
-            results
+          <p className={`mb-0 ${styles.paginationInfo}`}>
+            Showing <span className={styles.infoText}>{startItem}</span> to{" "}
+            <span className={styles.infoText}>{endItem}</span> of{" "}
+            <span className={styles.infoText}>{totalItems}</span> results
           </p>
         </div>
       )}
 
       <div className="d-flex">
-        <nav className="d-inline-flex gap-1" aria-label="Pagination">
+        <nav
+          className={`d-inline-flex ${styles.paginationButtons}`}
+          aria-label="Pagination"
+        >
           {/* Previous Button */}
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            style={{
-              padding: "8px 14px",
-              fontSize: "0.9rem",
-              fontWeight: 500,
-              border: "1px solid rgba(99, 102, 241, 0.2)",
-              borderRadius: "10px",
-              background: "white",
-              color: currentPage === 1 ? "#cbd5e1" : "#6366f1",
-              cursor: currentPage === 1 ? "not-allowed" : "pointer",
-              transition: "all 0.3s ease",
-              opacity: currentPage === 1 ? 0.5 : 1,
-            }}
-            onMouseEnter={(e) => {
-              if (currentPage !== 1) {
-                e.currentTarget.style.background = "rgba(99, 102, 241, 0.05)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage !== 1) {
-                e.currentTarget.style.background = "white";
-              }
-            }}
+            className={`${styles.pageButton} ${currentPage === 1 ? styles.pageNumberDisabled : ""}`}
           >
             ←
           </button>
@@ -116,54 +79,14 @@ const Pagination = ({
           {/* Page Numbers */}
           {getPageNumbers().map((page, index) =>
             page === "..." ? (
-              <span
-                key={`ellipsis-${index}`}
-                style={{
-                  padding: "8px 12px",
-                  fontSize: "0.9rem",
-                  color: "#94a3b8",
-                  display: "inline-flex",
-                  alignItems: "center",
-                }}
-              >
+              <span key={`ellipsis-${index}`} className={styles.ellipsis}>
                 ...
               </span>
             ) : (
               <button
                 key={page}
                 onClick={() => onPageChange(page)}
-                style={{
-                  padding: "8px 14px",
-                  fontSize: "0.9rem",
-                  fontWeight: 500,
-                  border:
-                    currentPage === page
-                      ? "none"
-                      : "1px solid rgba(99, 102, 241, 0.2)",
-                  borderRadius: "10px",
-                  background:
-                    currentPage === page
-                      ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-                      : "white",
-                  color: currentPage === page ? "white" : "#64748b",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  boxShadow:
-                    currentPage === page
-                      ? "0 4px 12px rgba(102, 126, 234, 0.3)"
-                      : "none",
-                }}
-                onMouseEnter={(e) => {
-                  if (currentPage !== page) {
-                    e.currentTarget.style.background =
-                      "rgba(99, 102, 241, 0.05)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (currentPage !== page) {
-                    e.currentTarget.style.background = "white";
-                  }
-                }}
+                className={`${styles.pageNumber} ${currentPage === page ? styles.pageNumberActive : ""}`}
               >
                 {page}
               </button>
@@ -174,28 +97,7 @@ const Pagination = ({
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            style={{
-              padding: "8px 14px",
-              fontSize: "0.9rem",
-              fontWeight: 500,
-              border: "1px solid rgba(99, 102, 241, 0.2)",
-              borderRadius: "10px",
-              background: "white",
-              color: currentPage === totalPages ? "#cbd5e1" : "#6366f1",
-              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-              transition: "all 0.3s ease",
-              opacity: currentPage === totalPages ? 0.5 : 1,
-            }}
-            onMouseEnter={(e) => {
-              if (currentPage !== totalPages) {
-                e.currentTarget.style.background = "rgba(99, 102, 241, 0.05)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage !== totalPages) {
-                e.currentTarget.style.background = "white";
-              }
-            }}
+            className={`${styles.pageButton} ${currentPage === totalPages ? styles.pageNumberDisabled : ""}`}
           >
             →
           </button>

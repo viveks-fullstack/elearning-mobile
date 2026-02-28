@@ -5,6 +5,8 @@ import {
   updateClass,
   deleteClass,
   regenerateMeetingLink,
+  generateAuthorizedMeetingLink,
+  joinMeeting,
   getClassesByTeacher,
   assignTeacherToClasses
 } from './class.controller.js'
@@ -32,6 +34,18 @@ export default async function (app) {
     '/',
     { preHandler: roleGuard(['admin', 'teacher', 'student']) },
     getClasses
+  )
+
+  app.get(
+    '/:id/meeting-link',
+    { preHandler: roleGuard(['admin', 'teacher', 'student']) },
+    generateAuthorizedMeetingLink
+  )
+
+  app.get(
+    '/:id/join-meeting',
+    { preHandler: roleGuard(['admin', 'teacher', 'student']) },
+    joinMeeting
   )
 
   app.get(

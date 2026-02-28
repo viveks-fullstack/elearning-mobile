@@ -54,6 +54,24 @@ const schema = new mongoose.Schema(
         checkInTime: {
             type: Date,
             default: null
+        },
+
+        checkOutTime: {
+            type: Date,
+            default: null
+        },
+
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+            index: true
+        },
+
+        type: {
+            type: String,
+            enum: ['login', 'manual'],
+            default: 'login'
         }
     },
     { timestamps: true }
@@ -61,6 +79,65 @@ const schema = new mongoose.Schema(
 
 // Compound index to ensure one attendance record per student per class per day
 schema.index({ student: 1, class: 1, date: 1 }, { unique: true })
+
+// Index for user login tracking
+schema.index({ user: 1, date: 1, type: 1 })
+
+// Static method for login attendance
+schema.statics.recordLogin = async function (userId) {
+    const today = new Date()
+    const startOfDay = new Date(today)
+    startOfDay.setHours(0, 0, 0, 0)
+
+    const attendance = await this.findOneAndUpdate(
+        {
+            user: userId,
+            date: { $gte: startOfDay },
+            type: 'login'
+        },
+        {
+            checkInTime: new Date(),
+            checkOutTime: null
+        },
+        {
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true
+        }
+    )
+
+    return attendance
+}
+
+// Static method for logout attendance
+schema.statics.recordLogout = async function (userId) {
+    const today = new Date()
+    const startOfDay = new Date(today)
+    startOfDay.setHours(0, 0, 0, 0)
+
+    const attendance = await this.findOneAndUpdate(
+        {
+            user: userId,
+            date: { $gte: startOfDay },
+            type: 'login'
+        },
+        {
+            checkOutTime: new Date()
+        },
+        { new: true }
+    )
+
+    return attendance
+}
+
+// Get login attendance for a user
+schema.statics.getUserLoginAttendance = function (userId, startDate, endDate) {
+    return this.find({
+        user: userId,
+        type: 'login',
+        date: { $gte: startDate, $lte: endDate }
+    }).sort({ date: -1 })
+}
 
 // Static methods
 schema.statics.markAttendance = async function (studentId, classId, date, status, markedBy, remarks = null) {

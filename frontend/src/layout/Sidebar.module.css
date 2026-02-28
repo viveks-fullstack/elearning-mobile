@@ -1,0 +1,154 @@
+.sidebar {
+  width: 280px;
+  padding: 20px 15px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collapsed {
+  width: 80px;
+  padding: 20px 10px;
+}
+
+.logoSection {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.logoCard {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 18px 56px 18px 15px;
+  text-align: left;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.logoCardCollapsed {
+  font-size: 0;
+  padding: 15px;
+  text-align: center;
+  justify-content: center;
+}
+
+.logoText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hamburgerButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.hamburgerButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.hamburgerButtonCollapsed {
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+}
+
+.hamburgerButtonCollapsed:hover {
+  transform: translate(50%, -50%) scale(1.05);
+}
+
+.menu {
+  flex: 1;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #cbd5e1;
+  border: 1px solid transparent;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.menuItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.menuItem:not(.menuItemCollapsed):hover {
+  transform: translateX(4px);
+}
+
+.menuItemCollapsed {
+  justify-content: center;
+}
+
+.menuItemActive {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.menuIcon {
+  display: flex;
+  align-items: center;
+  min-width: 20px;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-top: 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  cursor: pointer;
+  width: 100%;
+  overflow: hidden;
+}
+
+.logoutButton:hover {
+  background: rgba(239, 68, 68, 0.2);
+}

@@ -17,8 +17,15 @@ import {
 } from "../../courses/courses.api";
 import toast from "react-hot-toast";
 import Button from "../../../components/Button";
+import {
+  FormField,
+  PasswordField,
+  SelectField,
+} from "../../../components/FormField";
 import EyeOpen from "../../../assets/svg/EyeOpen";
 import EyeClosed from "../../../assets/svg/EyeClosed";
+import styles from "./AddUpdateTeacher.module.css";
+import modalStyles from "../../../components/Modal.module.css";
 
 // Custom styles for react-select
 const selectStyles = {
@@ -254,293 +261,140 @@ export default function AddUpdateTeacher({
   const isLoading = addMutation.isPending || updateMutation.isPending;
 
   return (
-    <div
-      className="modal d-block"
-      style={{
-        backgroundColor: "rgba(0,0,0,0.4)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-      }}
-    >
-      <div className="modal-dialog modal-lg" style={{ margin: "30px auto" }}>
+    <div className={`modal d-block ${modalStyles.modalOverlay}`}>
+      <div className={`modal-dialog modal-lg ${modalStyles.modalDialog}`}>
         <div
-          className="modal-content glass-card animate-fade-in"
-          style={{
-            border: "none",
-            borderRadius: "24px",
-            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
-            overflow: "hidden",
-          }}
+          className={`modal-content glass-card animate-fade-in ${modalStyles.modalContent}`}
         >
-          <div
-            className="modal-header border-0"
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              padding: "24px 32px",
-              borderRadius: "24px 24px 0 0",
-            }}
-          >
-            <h5
-              className="modal-title fw-bold"
-              style={{ color: "white", fontSize: "1.25rem" }}
-            >
+          <div className={`modal-header border-0 ${modalStyles.modalHeader}`}>
+            <h5 className={`modal-title fw-bold ${modalStyles.modalTitle}`}>
               {teacher ? "Update Teacher" : "Add New Teacher"}
             </h5>
             <button
               type="button"
-              className="btn-close btn-close-white"
+              className={`${modalStyles.closeButton} btn-close btn-close-white`}
               onClick={onClose}
-              style={{ filter: "brightness(0) invert(1)" }}
             ></button>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div
-              className="modal-body"
-              style={{
-                padding: "32px",
-                maxHeight: "calc(100vh - 250px)",
-                overflowY: "auto",
-              }}
-            >
+            <div className={`modal-body ${modalStyles.modalBody}`}>
               <div className="row">
                 {/* Name */}
-                <div className="col-md-6 mb-3">
-                  <label className="form-label fw-bold">
-                    Name <span className="text-danger">*</span>
-                  </label>
-                  <Controller
+                <div className="col-md-6">
+                  <FormField
+                    label="Name"
                     name="name"
                     control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        type="text"
-                        className={`form-control ${errors.name ? "is-invalid" : ""}`}
-                        placeholder="Enter teacher name"
-                      />
-                    )}
+                    errors={errors}
+                    placeholder="Enter teacher name"
+                    required
                   />
-                  {errors.name && (
-                    <div className="invalid-feedback d-block">
-                      {errors.name.message}
-                    </div>
-                  )}
                 </div>
 
                 {/* Email */}
-                <div className="col-md-6 mb-3">
-                  <label className="form-label fw-bold">
-                    Email <span className="text-danger">*</span>
-                  </label>
-                  <Controller
+                <div className="col-md-6">
+                  <FormField
+                    label="Email"
                     name="email"
                     control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        type="email"
-                        className={`form-control ${errors.email ? "is-invalid" : ""}`}
-                        placeholder="Enter email"
-                      />
-                    )}
+                    errors={errors}
+                    type="email"
+                    placeholder="Enter email"
+                    required
                   />
-                  {errors.email && (
-                    <div className="invalid-feedback d-block">
-                      {errors.email.message}
-                    </div>
-                  )}
                 </div>
 
                 {/* Phone */}
-                <div className="col-md-6 mb-3">
-                  <label className="form-label fw-bold">
-                    Phone <span className="text-danger">*</span>
-                  </label>
-                  <Controller
+                <div className="col-md-6">
+                  <FormField
+                    label="Phone"
                     name="phone"
                     control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        type="tel"
-                        className={`form-control ${errors.phone ? "is-invalid" : ""}`}
-                        placeholder="Enter phone number"
-                      />
-                    )}
+                    errors={errors}
+                    type="tel"
+                    placeholder="Enter phone number"
+                    required
                   />
-                  {errors.phone && (
-                    <div className="invalid-feedback d-block">
-                      {errors.phone.message}
-                    </div>
-                  )}
                 </div>
 
                 {/* Password */}
-                <div className="col-md-6 mb-3">
-                  <label className="form-label fw-bold">
-                    Password <span className="text-danger">*</span>
-                  </label>
-                  <div style={{ position: "relative" }}>
-                    <Controller
-                      name="password"
-                      control={control}
-                      render={({ field }) => (
-                        <input
-                          {...field}
-                          type={showPassword ? "text" : "password"}
-                          className={`form-control ${errors.password ? "is-invalid" : ""}`}
-                          placeholder="Enter password"
-                          style={{ paddingRight: "38px" }}
-                        />
-                      )}
-                    />
-                    <button
-                      type="button"
-                      style={{
-                        position: "absolute",
-                        right: "10px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        padding: "0",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "24px",
-                        height: "24px",
-                      }}
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <EyeOpen /> : <EyeClosed />}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <div className="invalid-feedback d-block">
-                      {errors.password.message}
-                    </div>
-                  )}
+                <div className="col-md-6">
+                  <PasswordField
+                    label="Password"
+                    name="password"
+                    control={control}
+                    errors={errors}
+                    placeholder="Enter password"
+                    showPassword={showPassword}
+                    onTogglePassword={() => setShowPassword(!showPassword)}
+                    PasswordIcon={showPassword ? <EyeOpen /> : <EyeClosed />}
+                    required
+                  />
                 </div>
 
                 {/* Qualifications */}
                 <div className="col-12 mb-3">
-                  <label className="form-label fw-bold">
+                  <label className={styles.selectLabel}>
                     Qualifications <span className="text-danger">*</span>
                   </label>
                   {qualificationFields.map((field, index) => (
                     <div key={field.id} className="card mb-3 p-3">
                       <div className="row">
                         <div className="col-md-6 mb-2">
-                          <label className="form-label">Degree *</label>
-                          <Controller
+                          <FormField
+                            label="Degree"
                             name={`teacherProfile.qualifications.${index}.degree`}
                             control={control}
-                            render={({ field }) => (
-                              <input
-                                {...field}
-                                type="text"
-                                className={`form-control ${errors.teacherProfile?.qualifications?.[index]?.degree ? "is-invalid" : ""}`}
-                                placeholder="e.g., B.Ed, M.Ed, PhD"
-                              />
-                            )}
+                            errors={errors}
+                            placeholder="e.g., B.Ed, M.Ed, PhD"
+                            required
                           />
-                          {errors.teacherProfile?.qualifications?.[index]
-                            ?.degree && (
-                            <div className="invalid-feedback d-block">
-                              {
-                                errors.teacherProfile.qualifications[index]
-                                  .degree.message
-                              }
-                            </div>
-                          )}
                         </div>
                         <div className="col-md-6 mb-2">
-                          <label className="form-label">
-                            University/Institute *
-                          </label>
-                          <Controller
+                          <FormField
+                            label="University/Institute"
                             name={`teacherProfile.qualifications.${index}.university`}
                             control={control}
-                            render={({ field }) => (
-                              <input
-                                {...field}
-                                type="text"
-                                className={`form-control ${errors.teacherProfile?.qualifications?.[index]?.university ? "is-invalid" : ""}`}
-                                placeholder="University or Institute name"
-                              />
-                            )}
+                            errors={errors}
+                            placeholder="University or Institute name"
+                            required
                           />
-                          {errors.teacherProfile?.qualifications?.[index]
-                            ?.university && (
-                            <div className="invalid-feedback d-block">
-                              {
-                                errors.teacherProfile.qualifications[index]
-                                  .university.message
-                              }
-                            </div>
-                          )}
                         </div>
                         <div className="col-md-5 mb-2">
-                          <label className="form-label">Start Year *</label>
-                          <Controller
+                          <FormField
+                            label="Start Year"
                             name={`teacherProfile.qualifications.${index}.startYear`}
                             control={control}
-                            render={({ field }) => (
-                              <input
-                                {...field}
-                                type="number"
-                                className={`form-control ${errors.teacherProfile?.qualifications?.[index]?.startYear ? "is-invalid" : ""}`}
-                                placeholder="2020"
-                                min="1950"
-                              />
-                            )}
+                            errors={errors}
+                            type="number"
+                            placeholder="2020"
+                            min="1950"
+                            required
                           />
-                          {errors.teacherProfile?.qualifications?.[index]
-                            ?.startYear && (
-                            <div className="invalid-feedback d-block">
-                              {
-                                errors.teacherProfile.qualifications[index]
-                                  .startYear.message
-                              }
-                            </div>
-                          )}
                         </div>
                         <div className="col-md-5 mb-2">
-                          <label className="form-label">End Year *</label>
-                          <Controller
+                          <FormField
+                            label="End Year"
                             name={`teacherProfile.qualifications.${index}.endYear`}
                             control={control}
-                            render={({ field }) => (
-                              <input
-                                {...field}
-                                type="number"
-                                className={`form-control ${errors.teacherProfile?.qualifications?.[index]?.endYear ? "is-invalid" : ""}`}
-                                placeholder="2024"
-                                min="1950"
-                              />
-                            )}
+                            errors={errors}
+                            type="number"
+                            placeholder="2024"
+                            min="1950"
+                            required
                           />
-                          {errors.teacherProfile?.qualifications?.[index]
-                            ?.endYear && (
-                            <div className="invalid-feedback d-block">
-                              {
-                                errors.teacherProfile.qualifications[index]
-                                  .endYear.message
-                              }
-                            </div>
-                          )}
                         </div>
                         <div className="col-md-2 mb-2 d-flex align-items-end">
                           {qualificationFields.length > 1 && (
-                            <button
+                            <Button
                               type="button"
-                              className="btn btn-outline-danger w-100"
+                              variant="outline"
+                              className={styles.removeInlineButton}
                               onClick={() => removeQualification(index)}
                             >
                               −
-                            </button>
+                            </Button>
                           )}
                         </div>
                       </div>
@@ -548,7 +402,7 @@ export default function AddUpdateTeacher({
                   ))}
                   <button
                     type="button"
-                    className="btn btn-outline-primary btn-sm"
+                    className={styles.addInlineButton}
                     onClick={() =>
                       appendQualification({
                         degree: "",
@@ -561,7 +415,7 @@ export default function AddUpdateTeacher({
                     + Add Qualification
                   </button>
                   {errors.teacherProfile?.qualifications && (
-                    <div className="invalid-feedback d-block">
+                    <div className={styles.fieldError}>
                       {errors.teacherProfile.qualifications.message}
                     </div>
                   )}
@@ -569,114 +423,57 @@ export default function AddUpdateTeacher({
 
                 {/* Experiences */}
                 <div className="col-12 mb-3">
-                  <label className="form-label fw-bold">
+                  <label className={styles.selectLabel}>
                     Experience <span className="text-danger">*</span>
                   </label>
                   {experienceFields.map((field, index) => (
                     <div key={field.id} className="card mb-3 p-3">
                       <div className="row">
                         <div className="col-md-6 mb-2">
-                          <label className="form-label">Job Title *</label>
-                          <Controller
+                          <FormField
+                            label="Job Title"
                             name={`teacherProfile.experiences.${index}.title`}
                             control={control}
-                            render={({ field }) => (
-                              <input
-                                {...field}
-                                type="text"
-                                className={`form-control ${errors.teacherProfile?.experiences?.[index]?.title ? "is-invalid" : ""}`}
-                                placeholder="e.g., Senior Teacher, Principal"
-                              />
-                            )}
+                            errors={errors}
+                            placeholder="e.g., Senior Teacher, Principal"
+                            required
                           />
-                          {errors.teacherProfile?.experiences?.[index]
-                            ?.title && (
-                            <div className="invalid-feedback d-block">
-                              {
-                                errors.teacherProfile.experiences[index].title
-                                  .message
-                              }
-                            </div>
-                          )}
                         </div>
                         <div className="col-md-6 mb-2">
-                          <label className="form-label">
-                            Company/Organization *
-                          </label>
-                          <Controller
+                          <FormField
+                            label="Company/Organization"
                             name={`teacherProfile.experiences.${index}.company`}
                             control={control}
-                            render={({ field }) => (
-                              <input
-                                {...field}
-                                type="text"
-                                className={`form-control ${errors.teacherProfile?.experiences?.[index]?.company ? "is-invalid" : ""}`}
-                                placeholder="Company or school name"
-                              />
-                            )}
+                            errors={errors}
+                            placeholder="Company or school name"
+                            required
                           />
-                          {errors.teacherProfile?.experiences?.[index]
-                            ?.company && (
-                            <div className="invalid-feedback d-block">
-                              {
-                                errors.teacherProfile.experiences[index].company
-                                  .message
-                              }
-                            </div>
-                          )}
                         </div>
                         <div className="col-md-4 mb-2">
-                          <label className="form-label">Start Year *</label>
-                          <Controller
+                          <FormField
+                            label="Start Year"
                             name={`teacherProfile.experiences.${index}.startYear`}
                             control={control}
-                            render={({ field }) => (
-                              <input
-                                {...field}
-                                type="number"
-                                className={`form-control ${errors.teacherProfile?.experiences?.[index]?.startYear ? "is-invalid" : ""}`}
-                                placeholder="2020"
-                                min="1950"
-                              />
-                            )}
+                            errors={errors}
+                            type="number"
+                            placeholder="2020"
+                            min="1950"
+                            required
                           />
-                          {errors.teacherProfile?.experiences?.[index]
-                            ?.startYear && (
-                            <div className="invalid-feedback d-block">
-                              {
-                                errors.teacherProfile.experiences[index]
-                                  .startYear.message
-                              }
-                            </div>
-                          )}
                         </div>
                         <div className="col-md-4 mb-2">
-                          <label className="form-label">End Year</label>
-                          <Controller
+                          <FormField
+                            label="End Year"
                             name={`teacherProfile.experiences.${index}.endYear`}
                             control={control}
-                            render={({ field }) => (
-                              <input
-                                {...field}
-                                type="number"
-                                className={`form-control ${errors.teacherProfile?.experiences?.[index]?.endYear ? "is-invalid" : ""}`}
-                                placeholder="2024 or leave empty if current"
-                                min="1950"
-                              />
-                            )}
+                            errors={errors}
+                            type="number"
+                            placeholder="2024 or leave empty if current"
+                            min="1950"
                           />
-                          {errors.teacherProfile?.experiences?.[index]
-                            ?.endYear && (
-                            <div className="invalid-feedback d-block">
-                              {
-                                errors.teacherProfile.experiences[index].endYear
-                                  .message
-                              }
-                            </div>
-                          )}
                         </div>
                         <div className="col-md-2 mb-2">
-                          <label className="form-label">Current</label>
+                          <label className={styles.selectLabel}>Current</label>
                           <Controller
                             name={`teacherProfile.experiences.${index}.isCurrent`}
                             control={control}
@@ -695,13 +492,14 @@ export default function AddUpdateTeacher({
                         </div>
                         <div className="col-md-2 mb-2 d-flex align-items-end">
                           {experienceFields.length > 1 && (
-                            <button
+                            <Button
                               type="button"
-                              className="btn btn-outline-danger w-100"
+                              variant="outline"
+                              className={styles.removeInlineButton}
                               onClick={() => removeExperience(index)}
                             >
                               −
-                            </button>
+                            </Button>
                           )}
                         </div>
                       </div>
@@ -709,7 +507,7 @@ export default function AddUpdateTeacher({
                   ))}
                   <button
                     type="button"
-                    className="btn btn-outline-primary btn-sm"
+                    className={styles.addInlineButton}
                     onClick={() =>
                       appendExperience({
                         title: "",
@@ -723,7 +521,7 @@ export default function AddUpdateTeacher({
                     + Add Experience
                   </button>
                   {errors.teacherProfile?.experiences && (
-                    <div className="invalid-feedback d-block">
+                    <div className={styles.fieldError}>
                       {errors.teacherProfile.experiences.message}
                     </div>
                   )}
@@ -731,7 +529,7 @@ export default function AddUpdateTeacher({
 
                 {/* Assign Class */}
                 <div className="col-md-6 mb-3">
-                  <label className="form-label fw-bold">
+                  <label className={styles.selectLabel}>
                     Assign Class <span className="text-danger">*</span>
                   </label>
                   <Controller
@@ -765,7 +563,7 @@ export default function AddUpdateTeacher({
                     )}
                   />
                   {errors.classId && (
-                    <div className="invalid-feedback d-block">
+                    <div className={styles.fieldError}>
                       {errors.classId.message}
                     </div>
                   )}
@@ -773,7 +571,7 @@ export default function AddUpdateTeacher({
 
                 {/* Assign Course */}
                 <div className="col-md-6 mb-3">
-                  <label className="form-label fw-bold">
+                  <label className={styles.selectLabel}>
                     Assign Course <span className="text-danger">*</span>
                   </label>
                   <Controller
@@ -809,7 +607,7 @@ export default function AddUpdateTeacher({
                     )}
                   />
                   {errors.courseId && (
-                    <div className="invalid-feedback d-block">
+                    <div className={styles.fieldError}>
                       {errors.courseId.message}
                     </div>
                   )}
@@ -817,42 +615,21 @@ export default function AddUpdateTeacher({
               </div>
             </div>
 
-            <div
-              className="modal-footer border-0"
-              style={{ padding: "20px 32px 32px", gap: "12px" }}
-            >
+            <div className={`modal-footer border-0 ${modalStyles.modalFooter}`}>
               <Button
                 variant="secondary"
                 onClick={onClose}
                 disabled={isLoading}
-                style={{
-                  padding: "12px 32px",
-                  borderRadius: "12px",
-                  fontWeight: "600",
-                }}
               >
                 Cancel
               </Button>
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={isLoading}
-                style={{
-                  padding: "12px 32px",
-                  borderRadius: "12px",
-                  fontWeight: "600",
-                  background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  border: "none",
-                }}
-              >
+              <Button variant="primary" type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <span
                       className="spinner-border spinner-border-sm me-2"
                       role="status"
                       aria-hidden="true"
-                      style={{ display: "inline-block" }}
                     ></span>
                     {teacher ? "Updating..." : "Adding..."}
                   </>

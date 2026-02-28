@@ -1,5 +1,7 @@
 import Fastify from "fastify";
 import multipart from "@fastify/multipart";
+import fastifyStatic from "@fastify/static";
+import path from "node:path";
 import routes from "./routes.js";
 import { connectDB } from "./config/db.js";
 import jwtPlugin from "./plugins/jwt.js";
@@ -13,6 +15,10 @@ const app = Fastify({ logger: true });
 await connectDB();
 await seedAdmin();
 await registerCors(app)
+await app.register(fastifyStatic, {
+    root: path.join(process.cwd(), "uploads"),
+    prefix: "/uploads/",
+});
 await app.register(multipart);
 await app.register(jwtPlugin);
 errorHandler(app);

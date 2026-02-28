@@ -24,6 +24,7 @@ export const API_ENDPOINTS = {
     CLASS_TEACHER: (teacherId) => `${API_BASE}/classes/teacher/${teacherId}`,
     ASSIGN_TEACHER_CLASS: `${API_BASE}/classes/assign-teacher`,
     REGENERATE_LINK: (id) => `${API_BASE}/classes/${id}/regenerate-link`,
+    GENERATE_MEETING_LINK: (id) => `${API_BASE}/classes/${id}/meeting-link`,
 
     // Courses
     COURSES: `${API_BASE}/courses`,

@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import User from '../user/user.model.js'
+import Attendance from '../attendance/attendance.model.js'
 import { success, error } from '../../utils/response.js'
 
 export const login = async (req, reply) => {
@@ -28,6 +29,14 @@ export const login = async (req, reply) => {
       id: user._id,
       role: user.role
     })
+
+    // Record login attendance
+    try {
+      await Attendance.recordLogin(user._id)
+    } catch (attendanceError) {
+      req.log.error('Failed to record login attendance:', attendanceError)
+      // Don't fail the login due to attendance recording failure
+    }
 
     return success(
       reply,

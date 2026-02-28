@@ -9,6 +9,7 @@ import MoneyIcon from "../../assets/svg/MoneyIcon";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDashboardStats } from "./dashboard.api";
 import Spinner from "../../components/Spinner";
+import styles from "./Dashboard.module.css";
 
 export default function Dashboard() {
   const { data: stats, isLoading } = useQuery({
@@ -31,27 +32,14 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "calc(100vh - 100px)",
-        }}
-      >
+      <div className={styles.loadingContainer}>
         <Spinner />
       </div>
     );
   }
 
   return (
-    <div
-      className="container-fluid p-4"
-      style={{
-        minHeight: "calc(100vh - 100px)",
-        paddingTop: "30px !important",
-      }}
-    >
+    <div className={styles.container}>
       <WelcomeBanner />
 
       <div className="row g-4">

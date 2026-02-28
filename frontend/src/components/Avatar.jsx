@@ -1,4 +1,17 @@
+import styles from "./Avatar.module.css";
+
 export default function Avatar({ name, image, size = 38 }) {
+  const sizeClassByPx = {
+    32: styles.avatarXs,
+    38: styles.avatarSm,
+    40: styles.avatarSm,
+    48: styles.avatarMd,
+    64: styles.avatarLg,
+    80: styles.avatarXl,
+  };
+
+  const sizeClass = sizeClassByPx[size] || styles.avatarSm;
+
   const initials = name
     ?.split(" ")
     .map((n) => n[0])
@@ -14,37 +27,15 @@ export default function Avatar({ name, image, size = 38 }) {
     : null;
 
   return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        background: imageUrl
-          ? "transparent"
-          : "linear-gradient(135deg,#6366f1,#8b5cf6)",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: "600",
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
+    <div className={`${styles.avatar} ${sizeClass}`}>
       {imageUrl ? (
         <img
           src={imageUrl}
           alt={name || "Avatar"}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
+          className={styles.image}
           onError={(e) => {
             // Fallback to initials if image fails to load
             e.target.style.display = "none";
-            e.target.parentElement.style.background =
-              "linear-gradient(135deg,#6366f1,#8b5cf6)";
             e.target.parentElement.innerHTML = initials || "A";
           }}
         />

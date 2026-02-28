@@ -6,6 +6,7 @@ import TeacherList from "./modules/teachers/TeacherList";
 import ClassList from "./modules/classes/ClassList";
 import CourseList from "./modules/courses/CourseList";
 import Profile from "./modules/profile/Profile";
+import Attendance from "./modules/attendance/Attendance";
 import Login from "./modules/auth/Login";
 import { useAuth } from "./app/authContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -14,7 +15,6 @@ import AdminLayout from "./layout/AdminLayout";
 export default function Router() {
   const { isAuthenticated } = useAuth();
 
-  console.log("Router - isAuthenticated:", isAuthenticated);
   return (
     <BrowserRouter>
       <Routes>
@@ -39,6 +39,7 @@ export default function Router() {
           <Route path="/teachers" element={<TeacherList />} />
           <Route path="/classes" element={<ClassList />} />
           <Route path="/courses" element={<CourseList />} />
+          <Route path="/attendance" element={<Attendance />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
 

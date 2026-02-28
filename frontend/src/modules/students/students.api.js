@@ -63,7 +63,15 @@ export async function uploadImage({ file, type = 'local' }) {
             'Content-Type': 'multipart/form-data',
         },
     });
-    return response.data;
+    const uploadData = response.data?.data || response.data || {};
+    const filepath = uploadData.filepath || uploadData.path || uploadData.url || '';
+
+    return {
+        ...uploadData,
+        filepath,
+        path: uploadData.path || filepath,
+        url: uploadData.url || filepath,
+    };
 }
 
 export const addStudent = async (studentData) => {

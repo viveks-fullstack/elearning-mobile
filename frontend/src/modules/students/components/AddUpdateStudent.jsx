@@ -15,8 +15,24 @@ import {
 } from "../students.api";
 import toast from "react-hot-toast";
 import Button from "../../../components/Button";
+import { FormField, PasswordField } from "../../../components/FormField";
+import styles from "./AddUpdateStudent.module.css";
+import modalStyles from "../../../components/Modal.module.css";
 import EyeOpen from "../../../assets/svg/EyeOpen";
 import EyeClosed from "../../../assets/svg/EyeClosed";
+
+const toAbsoluteImageUrl = (image) => {
+  if (!image) return null;
+  if (
+    image.startsWith("http") ||
+    image.startsWith("blob:") ||
+    image.startsWith("data:")
+  ) {
+    return image;
+  }
+
+  return `${import.meta.env.VITE_API_BASE_URL?.replace("/api", "")}${image}`;
+};
 
 // Custom styles for react-select
 const selectStyles = {
@@ -67,35 +83,14 @@ const selectStyles = {
   }),
 };
 
-// Modern form field wrapper styles
-const formFieldStyle = {
-  marginBottom: "24px",
-};
-
-const labelStyle = {
-  display: "block",
-  marginBottom: "8px",
-  fontWeight: "600",
-  color: "#333",
-  fontSize: "0.95rem",
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "12px 16px",
-  borderRadius: "12px",
-  border: "1px solid #dee2e6",
-  fontSize: "0.95rem",
-  transition: "all 0.2s ease",
-  background: "white",
-};
-
 export default function AddUpdateStudent({
   onClose,
   onSuccess,
   student = null,
 }) {
-  const [imagePreview, setImagePreview] = useState(student?.image || null);
+  const [imagePreview, setImagePreview] = useState(
+    toAbsoluteImageUrl(student?.image || student?.profileImage || null),
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -135,7 +130,7 @@ export default function AddUpdateStudent({
 
       // Set image preview if available
       if (student.profileImage) {
-        setImagePreview(student.profileImage);
+        setImagePreview(toAbsoluteImageUrl(student.profileImage));
       }
     }
   }, [student, setValue]);
@@ -192,7 +187,14 @@ export default function AddUpdateStudent({
           file: payload.image,
           type: "local",
         });
-        payload.image = uploadRes.path || uploadRes.url || "";
+        const uploadedPath =
+          uploadRes.filepath || uploadRes.path || uploadRes.url || "";
+
+        if (!uploadedPath) {
+          throw new Error("Image upload response did not include a filepath");
+        }
+
+        payload.image = uploadedPath;
       }
 
       let studentId;
@@ -241,55 +243,24 @@ export default function AddUpdateStudent({
   const isLoading = addMutation.isPending || updateMutation.isPending;
 
   return (
-    <div
-      className="modal d-block"
-      style={{
-        backgroundColor: "rgba(0,0,0,0.4)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-      }}
-    >
-      <div className="modal-dialog modal-lg" style={{ margin: "30px auto" }}>
+    <div className={`modal d-block ${modalStyles.modalOverlay}`}>
+      <div className={`modal-dialog modal-lg ${modalStyles.modalDialog}`}>
         <div
-          className="modal-content glass-card animate-fade-in"
-          style={{
-            border: "none",
-            borderRadius: "24px",
-            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
-            overflow: "hidden",
-          }}
+          className={`modal-content glass-card animate-fade-in ${modalStyles.modalContent}`}
         >
-          <div
-            className="modal-header border-0"
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              padding: "24px 32px",
-              borderRadius: "24px 24px 0 0",
-            }}
-          >
-            <h5
-              className="modal-title fw-bold"
-              style={{ color: "white", fontSize: "1.25rem" }}
-            >
+          <div className={`modal-header border-0 ${modalStyles.modalHeader}`}>
+            <h5 className={`modal-title fw-bold ${modalStyles.modalTitle}`}>
               {student ? "Update Student" : "Add New Student"}
             </h5>
             <button
               type="button"
-              className="btn-close btn-close-white"
+              className={`${modalStyles.closeButton} btn-close btn-close-white`}
               onClick={onClose}
-              style={{ filter: "brightness(0) invert(1)" }}
             ></button>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div
-              className="modal-body"
-              style={{
-                padding: "32px",
-                maxHeight: "calc(100vh - 250px)",
-                overflowY: "auto",
-              }}
-            >
+            <div className={`modal-body ${modalStyles.modalBody}`}>
               <div className="row">
                 {/* Image */}
                 <div className="col-12 mb-3">
@@ -297,84 +268,21 @@ export default function AddUpdateStudent({
                     Image <span className="text-danger">*</span>
                   </label>
                   <div
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      height: "200px",
-                      borderRadius: "8px",
-                      overflow: "hidden",
-                      backgroundColor: "#f5f5f5",
-                      border: "2px dashed #dee2e6",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      borderColor: errors.image ? "#dc3545" : "#dee2e6",
-                    }}
+                    className={`${styles.imageDropzone} ${errors.image ? styles.imageDropzoneError : ""}`}
                     onClick={() => window.fileInputRef?.click()}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.borderColor = "#0d6efd")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.borderColor = errors.image
-                        ? "#dc3545"
-                        : "#dee2e6")
-                    }
                   >
                     {imagePreview ? (
                       <>
                         <img
                           src={imagePreview}
                           alt="Student"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
+                          className={styles.imagePreviewFull}
                         />
                         {/* Edit Icon */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: "12px",
-                            right: "12px",
-                            backgroundColor: "#0d6efd",
-                            color: "white",
-                            borderRadius: "50%",
-                            width: "44px",
-                            height: "44px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "24px",
-                            cursor: "pointer",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          ✎
-                        </div>
+                        <div className={styles.editIcon}>✎</div>
                         {/* Delete Icon */}
                         <div
-                          style={{
-                            position: "absolute",
-                            top: "12px",
-                            right: "12px",
-                            backgroundColor: "#dc3545",
-                            color: "white",
-                            borderRadius: "50%",
-                            width: "44px",
-                            height: "44px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "28px",
-                            cursor: "pointer",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
-                            fontWeight: "bold",
-                            lineHeight: "1",
-                          }}
+                          className={styles.deleteIcon}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteImage();
@@ -384,17 +292,9 @@ export default function AddUpdateStudent({
                         </div>
                       </>
                     ) : (
-                      <div style={{ textAlign: "center", color: "#6c757d" }}>
-                        <div
-                          style={{
-                            fontSize: "48px",
-                            marginBottom: "12px",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          +
-                        </div>
-                        <div style={{ fontSize: "16px", fontWeight: "500" }}>
+                      <div className={styles.imagePlaceholder}>
+                        <div className={styles.imagePlaceholderPlus}>+</div>
+                        <div className={styles.imagePlaceholderText}>
                           Click to add image
                         </div>
                       </div>
@@ -407,19 +307,14 @@ export default function AddUpdateStudent({
                       if (el) window.fileInputRef = el;
                     }}
                     type="file"
-                    style={{ display: "none" }}
+                    className={styles.hiddenInput}
                     accept="image/*"
                     onChange={handleImageChange}
                   />
 
                   {errors.image && (
                     <div
-                      className="invalid-feedback d-block"
-                      style={{
-                        display: "block",
-                        marginTop: "8px",
-                        color: "#dc3545",
-                      }}
+                      className={`invalid-feedback d-block ${styles.imageError}`}
                     >
                       {errors.image.message}
                     </div>
@@ -428,197 +323,60 @@ export default function AddUpdateStudent({
 
                 {/* Name */}
                 <div className="col-md-6 mb-3">
-                  <label style={labelStyle}>
-                    Name <span className="text-danger">*</span>
-                  </label>
-                  <Controller
+                  <FormField
+                    label="Name"
                     name="name"
                     control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        type="text"
-                        style={{
-                          ...inputStyle,
-                          borderColor: errors.name ? "#dc3545" : "#dee2e6",
-                        }}
-                        placeholder="Enter student name"
-                        onFocus={(e) =>
-                          (e.target.style.borderColor = "#667eea")
-                        }
-                        onBlur={(e) =>
-                          (e.target.style.borderColor = errors.name
-                            ? "#dc3545"
-                            : "#dee2e6")
-                        }
-                      />
-                    )}
+                    errors={errors}
+                    placeholder="Enter student name"
+                    required
                   />
-                  {errors.name && (
-                    <div
-                      style={{
-                        color: "#dc3545",
-                        fontSize: "0.875rem",
-                        marginTop: "4px",
-                      }}
-                    >
-                      {errors.name.message}
-                    </div>
-                  )}
                 </div>
 
                 {/* Email */}
                 <div className="col-md-6 mb-3">
-                  <label style={labelStyle}>
-                    Email <span className="text-danger">*</span>
-                  </label>
-                  <Controller
+                  <FormField
+                    label="Email"
                     name="email"
                     control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        type="email"
-                        style={{
-                          ...inputStyle,
-                          borderColor: errors.email ? "#dc3545" : "#dee2e6",
-                        }}
-                        placeholder="Enter email"
-                        onFocus={(e) =>
-                          (e.target.style.borderColor = "#667eea")
-                        }
-                        onBlur={(e) =>
-                          (e.target.style.borderColor = errors.email
-                            ? "#dc3545"
-                            : "#dee2e6")
-                        }
-                      />
-                    )}
+                    errors={errors}
+                    type="email"
+                    placeholder="Enter email"
+                    required
                   />
-                  {errors.email && (
-                    <div
-                      style={{
-                        color: "#dc3545",
-                        fontSize: "0.875rem",
-                        marginTop: "4px",
-                      }}
-                    >
-                      {errors.email.message}
-                    </div>
-                  )}
                 </div>
 
                 {/* Phone */}
                 <div className="col-md-6 mb-3">
-                  <label style={labelStyle}>
-                    Phone <span className="text-danger">*</span>
-                  </label>
-                  <Controller
+                  <FormField
+                    label="Phone"
                     name="phone"
                     control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        type="tel"
-                        style={{
-                          ...inputStyle,
-                          borderColor: errors.phone ? "#dc3545" : "#dee2e6",
-                        }}
-                        placeholder="Enter phone number"
-                        onFocus={(e) =>
-                          (e.target.style.borderColor = "#667eea")
-                        }
-                        onBlur={(e) =>
-                          (e.target.style.borderColor = errors.phone
-                            ? "#dc3545"
-                            : "#dee2e6")
-                        }
-                      />
-                    )}
+                    errors={errors}
+                    type="tel"
+                    placeholder="Enter phone number"
+                    required
                   />
-                  {errors.phone && (
-                    <div
-                      style={{
-                        color: "#dc3545",
-                        fontSize: "0.875rem",
-                        marginTop: "4px",
-                      }}
-                    >
-                      {errors.phone.message}
-                    </div>
-                  )}
                 </div>
 
                 {/* Password */}
                 <div className="col-md-6 mb-3">
-                  <label style={labelStyle}>
-                    Password <span className="text-danger">*</span>
-                  </label>
-                  <div style={{ position: "relative" }}>
-                    <Controller
-                      name="password"
-                      control={control}
-                      render={({ field }) => (
-                        <input
-                          {...field}
-                          type={showPassword ? "text" : "password"}
-                          style={{
-                            ...inputStyle,
-                            paddingRight: "48px",
-                            borderColor: errors.password
-                              ? "#dc3545"
-                              : "#dee2e6",
-                          }}
-                          placeholder="Enter password"
-                          onFocus={(e) =>
-                            (e.target.style.borderColor = "#667eea")
-                          }
-                          onBlur={(e) =>
-                            (e.target.style.borderColor = errors.password
-                              ? "#dc3545"
-                              : "#dee2e6")
-                          }
-                        />
-                      )}
-                    />
-                    <button
-                      type="button"
-                      style={{
-                        position: "absolute",
-                        right: "10px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        padding: "0",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "24px",
-                        height: "24px",
-                      }}
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <EyeOpen /> : <EyeClosed />}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <div
-                      style={{
-                        color: "#dc3545",
-                        fontSize: "0.875rem",
-                        marginTop: "4px",
-                      }}
-                    >
-                      {errors.password.message}
-                    </div>
-                  )}
+                  <PasswordField
+                    label="Password"
+                    name="password"
+                    control={control}
+                    errors={errors}
+                    placeholder="Enter password"
+                    showPassword={showPassword}
+                    onTogglePassword={() => setShowPassword(!showPassword)}
+                    PasswordIcon={showPassword ? <EyeOpen /> : <EyeClosed />}
+                    required
+                  />
                 </div>
 
                 {/* Class Selection */}
                 <div className="col-md-6 mb-3">
-                  <label style={labelStyle}>Class</label>
+                  <label className={styles.selectLabel}>Class</label>
                   <Select
                     options={classes.map((cls) => ({
                       value: cls._id,
@@ -645,7 +403,7 @@ export default function AddUpdateStudent({
 
                 {/* Course Selection */}
                 <div className="col-md-6 mb-3">
-                  <label style={labelStyle}>Course</label>
+                  <label className={styles.selectLabel}>Course</label>
                   <Select
                     options={courses.map((course) => ({
                       value: course._id,
@@ -668,147 +426,64 @@ export default function AddUpdateStudent({
                     placeholder="Select a course"
                     styles={selectStyles}
                   />
-                  <small className="text-muted" style={{ fontSize: "0.85rem" }}>
+                  <small className={`text-muted ${styles.selectHint}`}>
                     Students can be enrolled in one active course at a time
                   </small>
                 </div>
 
                 {/* Father Details */}
                 <div className="col-12 mb-3">
-                  <h6
-                    style={{
-                      fontWeight: "700",
-                      color: "#667eea",
-                      marginBottom: "16px",
-                      fontSize: "1.1rem",
-                    }}
-                  >
-                    Father Details
-                  </h6>
+                  <h6 className={styles.sectionHeader}>Father Details</h6>
                   <div className="row">
                     <div className="col-md-6 mb-3">
-                      <label style={labelStyle}>
-                        Name <span className="text-danger">*</span>
-                      </label>
-                      <Controller
+                      <FormField
+                        label="Name"
                         name="parents.father.name"
                         control={control}
-                        render={({ field }) => (
-                          <input
-                            {...field}
-                            type="text"
-                            style={{
-                              ...inputStyle,
-                              borderColor: errors.parents?.father?.name
-                                ? "#dc3545"
-                                : "#dee2e6",
-                            }}
-                            placeholder="Enter father name"
-                            onFocus={(e) =>
-                              (e.target.style.borderColor = "#667eea")
-                            }
-                            onBlur={(e) =>
-                              (e.target.style.borderColor = errors.parents
-                                ?.father?.name
-                                ? "#dc3545"
-                                : "#dee2e6")
-                            }
-                          />
-                        )}
+                        errors={errors}
+                        placeholder="Enter father name"
+                        required
                       />
-                      {errors.parents?.father?.name && (
-                        <div
-                          style={{
-                            color: "#dc3545",
-                            fontSize: "0.875rem",
-                            marginTop: "4px",
-                          }}
-                        >
-                          {errors.parents.father.name.message}
-                        </div>
-                      )}
                     </div>
 
                     <div className="col-md-6 mb-3">
-                      <label style={labelStyle}>
-                        Phone <span className="text-danger">*</span>
-                      </label>
-                      <Controller
+                      <FormField
+                        label="Phone"
                         name="parents.father.phone"
                         control={control}
-                        render={({ field }) => (
-                          <input
-                            {...field}
-                            type="tel"
-                            style={{
-                              ...inputStyle,
-                              borderColor: errors.parents?.father?.phone
-                                ? "#dc3545"
-                                : "#dee2e6",
-                            }}
-                            placeholder="Enter father phone"
-                            onFocus={(e) =>
-                              (e.target.style.borderColor = "#667eea")
-                            }
-                            onBlur={(e) =>
-                              (e.target.style.borderColor = errors.parents
-                                ?.father?.phone
-                                ? "#dc3545"
-                                : "#dee2e6")
-                            }
-                          />
-                        )}
+                        errors={errors}
+                        type="tel"
+                        placeholder="Enter father phone"
+                        required
                       />
-                      {errors.parents?.father?.phone && (
-                        <div
-                          style={{
-                            color: "#dc3545",
-                            fontSize: "0.875rem",
-                            marginTop: "4px",
-                          }}
-                        >
-                          {errors.parents.father.phone.message}
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Mother Details */}
                 <div className="col-12 mb-3">
-                  <h6 className="fw-bold text-secondary mb-3">
+                  <h6 className={styles.sectionHeader}>
                     Mother Details (Optional)
                   </h6>
                   <div className="row">
                     <div className="col-md-6 mb-3">
-                      <label className="form-label fw-bold">Name</label>
-                      <Controller
+                      <FormField
+                        label="Name"
                         name="parents.mother.name"
                         control={control}
-                        render={({ field }) => (
-                          <input
-                            {...field}
-                            type="text"
-                            className="form-control"
-                            placeholder="Enter mother name"
-                          />
-                        )}
+                        errors={errors}
+                        placeholder="Enter mother name"
                       />
                     </div>
 
                     <div className="col-md-6 mb-3">
-                      <label className="form-label fw-bold">Phone</label>
-                      <Controller
+                      <FormField
+                        label="Phone"
                         name="parents.mother.phone"
                         control={control}
-                        render={({ field }) => (
-                          <input
-                            {...field}
-                            type="tel"
-                            className="form-control"
-                            placeholder="Enter mother phone"
-                          />
-                        )}
+                        errors={errors}
+                        type="tel"
+                        placeholder="Enter mother phone"
                       />
                     </div>
                   </div>
@@ -816,42 +491,21 @@ export default function AddUpdateStudent({
               </div>
             </div>
 
-            <div
-              className="modal-footer border-0"
-              style={{ padding: "20px 32px 32px", gap: "12px" }}
-            >
+            <div className={`modal-footer border-0 ${modalStyles.modalFooter}`}>
               <Button
                 variant="secondary"
                 onClick={onClose}
                 disabled={isLoading}
-                style={{
-                  padding: "12px 32px",
-                  borderRadius: "12px",
-                  fontWeight: "600",
-                }}
               >
                 Cancel
               </Button>
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={isLoading}
-                style={{
-                  padding: "12px 32px",
-                  borderRadius: "12px",
-                  fontWeight: "600",
-                  background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  border: "none",
-                }}
-              >
+              <Button variant="primary" type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <span
                       className="spinner-border spinner-border-sm me-2"
                       role="status"
                       aria-hidden="true"
-                      style={{ display: "inline-block" }}
                     ></span>
                     {student ? "Updating..." : "Adding..."}
                   </>

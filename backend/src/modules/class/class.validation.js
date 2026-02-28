@@ -8,6 +8,5 @@ export const createClassSchema = yup.object({
 export const updateClassSchema = yup.object({
   title: yup.string(),
   teacher: yup.string(),
-  totalHours: yup.number(),
-  meetingLink: yup.string()
+  totalHours: yup.number()
 })

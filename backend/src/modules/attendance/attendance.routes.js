@@ -6,7 +6,9 @@ import {
     getAttendanceStats,
     updateAttendance,
     deleteAttendance,
-    getAttendanceReport
+    getAttendanceReport,
+    recordLogout,
+    getUserLoginAttendance
 } from './attendance.controller.js'
 
 import {
@@ -73,5 +75,19 @@ export default async function (app) {
         '/:id',
         { preHandler: roleGuard(['admin']) },
         deleteAttendance
+    )
+
+    // Record user logout
+    app.post(
+        '/logout',
+        { preHandler: roleGuard(['admin', 'teacher', 'student']) },
+        recordLogout
+    )
+
+    // Get user login attendance history
+    app.get(
+        '/login-history',
+        { preHandler: roleGuard(['admin', 'teacher', 'student']) },
+        getUserLoginAttendance
     )
 }

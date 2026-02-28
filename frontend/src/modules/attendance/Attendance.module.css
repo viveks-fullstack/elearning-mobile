@@ -1,0 +1,68 @@
+/* Attendance Component Styles */
+.tabsHeader {
+  display: flex;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 24px;
+  gap: 8px;
+}
+
+.tabButton {
+  position: relative;
+  padding: 12px 24px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.tabButtonActive {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+  transform: translateY(2px);
+}
+
+.tabButtonInactive {
+  background: transparent;
+  color: #6b7280;
+  border-color: transparent;
+}
+
+.tabButtonInactive:hover {
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.tabButton:focus-visible {
+  outline: 2px solid rgba(102, 126, 234, 0.45);
+  outline-offset: 2px;
+}
+
+.fullWidthButton {
+  width: 100%;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.contentCard {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.emptyCard {
+  padding: 40px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
