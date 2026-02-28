@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Dashboard from "./modules/dashboard/Dashboard";
+import MeetingsDashboard from "./modules/dashboard/MeetingsDashboard";
 import StudentList from "./modules/students/StudentList";
 import TeacherList from "./modules/teachers/TeacherList";
 import ClassList from "./modules/classes/ClassList";
@@ -11,6 +12,14 @@ import Login from "./modules/auth/Login";
 import { useAuth } from "./app/authContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./layout/AdminLayout";
+
+function RoleDashboard() {
+  const { user } = useAuth();
+  if (user?.role === "student" || user?.role === "teacher") {
+    return <MeetingsDashboard />;
+  }
+  return <Dashboard />;
+}
 
 export default function Router() {
   const { isAuthenticated } = useAuth();
@@ -34,7 +43,7 @@ export default function Router() {
             </ProtectedRoute>
           }
         >
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<RoleDashboard />} />
           <Route path="/students" element={<StudentList />} />
           <Route path="/teachers" element={<TeacherList />} />
           <Route path="/classes" element={<ClassList />} />

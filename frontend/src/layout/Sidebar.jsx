@@ -12,7 +12,8 @@ import HamburgerIcon from "../assets/svg/HamburgerIcon";
 import styles from "./Sidebar.module.css";
 
 export default function Sidebar() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const role = user?.role;
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem("sidebarCollapsed");
     return saved === "true";
@@ -61,36 +62,40 @@ export default function Sidebar() {
           label="Dashboard"
           isCollapsed={isCollapsed}
         />
-        <SidebarItem
-          to="/students"
-          icon={<StudentIcon size={20} />}
-          label="Students"
-          isCollapsed={isCollapsed}
-        />
-        <SidebarItem
-          to="/teachers"
-          icon={<TeacherIcon size={20} />}
-          label="Teachers"
-          isCollapsed={isCollapsed}
-        />
-        <SidebarItem
-          to="/classes"
-          icon={<ClassIcon size={20} />}
-          label="Classes"
-          isCollapsed={isCollapsed}
-        />
-        <SidebarItem
-          to="/courses"
-          icon={<CourseIcon size={20} />}
-          label="Courses"
-          isCollapsed={isCollapsed}
-        />
-        <SidebarItem
-          to="/attendance"
-          icon={<StudentIcon size={20} />}
-          label="Attendance"
-          isCollapsed={isCollapsed}
-        />
+        {role === "admin" && (
+          <>
+            <SidebarItem
+              to="/students"
+              icon={<StudentIcon size={20} />}
+              label="Students"
+              isCollapsed={isCollapsed}
+            />
+            <SidebarItem
+              to="/teachers"
+              icon={<TeacherIcon size={20} />}
+              label="Teachers"
+              isCollapsed={isCollapsed}
+            />
+            <SidebarItem
+              to="/classes"
+              icon={<ClassIcon size={20} />}
+              label="Classes"
+              isCollapsed={isCollapsed}
+            />
+            <SidebarItem
+              to="/courses"
+              icon={<CourseIcon size={20} />}
+              label="Courses"
+              isCollapsed={isCollapsed}
+            />
+            <SidebarItem
+              to="/attendance"
+              icon={<StudentIcon size={20} />}
+              label="Attendance"
+              isCollapsed={isCollapsed}
+            />
+          </>
+        )}
         {/* Logout */}
         <button
           onClick={logout}

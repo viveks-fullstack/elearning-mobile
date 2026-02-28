@@ -9,7 +9,7 @@ import LogoutIcon from "../assets/svg/LogoutIcon";
 import styles from "./Topbar.module.css";
 
 export default function Topbar() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -20,7 +20,13 @@ export default function Topbar() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const userName = profile?.name || "Admin";
+  const roleName =
+    user?.role === "teacher"
+      ? "Teacher"
+      : user?.role === "student"
+        ? "Student"
+        : "Admin";
+  const userName = profile?.name || roleName;
   const userImage = profile?.profileImage || null;
 
   // Close dropdown when clicking outside
@@ -42,7 +48,7 @@ export default function Topbar() {
 
   return (
     <div className={`glass ${styles.topbar}`}>
-      <h4 className={styles.title}>Admin Dashboard</h4>
+      <h4 className={styles.title}>{roleName} Dashboard</h4>
 
       <div ref={dropdownRef} className={styles.dropdownContainer}>
         <div onClick={() => setOpen(!open)} className={styles.trigger}>
